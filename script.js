@@ -313,6 +313,278 @@ document.getElementById('diffForm').addEventListener('submit', function(e) {
 });
 
 // ============================================
+// TIME BETWEEN CALCULATOR
+// ============================================
+
+document.getElementById('timeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const startInput = document.getElementById('startDateTime').value;
+    const endInput = document.getElementById('endDateTime').value;
+    const resultDiv = document.getElementById('timeResult');
+    const errorDiv = document.getElementById('timeError');
+    
+    resultDiv.innerHTML = '';
+    errorDiv.innerHTML = '';
+    
+    if (!startInput || !endInput) {
+        errorDiv.innerHTML = '❌ Please enter both date and time values.';
+        return;
+    }
+    
+    let startDate = new Date(startInput);
+    let endDate = new Date(endInput);
+    
+    if (endDate < startDate) {
+        [startDate, endDate] = [endDate, startDate];
+    }
+    
+    const diffMs = endDate - startDate;
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    const hours = diffHours % 24;
+    const minutes = diffMinutes % 60;
+    const seconds = diffSeconds % 60;
+    
+    resultDiv.innerHTML = `
+        <h3>⏱️ Time Difference</h3>
+        <div class="result-grid">
+            <div class="result-item">
+                <span class="value">${diffDays}</span>
+                <span class="label">Days</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${hours}</span>
+                <span class="label">Hours</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${minutes}</span>
+                <span class="label">Minutes</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${seconds}</span>
+                <span class="label">Seconds</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border);">
+            <p><strong>Total:</strong> ${formatNumber(diffHours)} hours, ${formatNumber(diffMinutes)} minutes, ${formatNumber(diffSeconds)} seconds</p>
+        </div>
+        
+        <button class="copy-btn" onclick="copyResult('time')">📋 Copy Result</button>
+    `;
+});
+
+// ============================================
+// WEEK CALCULATOR
+// ============================================
+
+document.getElementById('weekForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const dateInput = document.getElementById('weekDate').value;
+    const resultDiv = document.getElementById('weekResult');
+    const errorDiv = document.getElementById('weekError');
+    
+    resultDiv.innerHTML = '';
+    errorDiv.innerHTML = '';
+    
+    if (!validateDate(dateInput)) {
+        errorDiv.innerHTML = '❌ Please enter a valid date.';
+        return;
+    }
+    
+    const date = new Date(dateInput);
+    
+    // Get week number
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const days = Math.floor((date - startOfYear) / (24 * 60 * 60 * 1000));
+    const weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+    
+    // Get day info
+    const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+    const dayOfYear = days + 1;
+    const daysInYear = isLeapYear(date.getFullYear()) ? 366 : 365;
+    const daysRemaining = daysInYear - dayOfYear;
+    
+    // Get quarter
+    const quarter = Math.ceil((date.getMonth() + 1) / 3);
+    
+    resultDiv.innerHTML = `
+        <h3>📅 Date Information</h3>
+        <div class="result-grid">
+            <div class="result-item">
+                <span class="value">${weekNumber}</span>
+                <span class="label">Week of Year</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${dayOfYear}</span>
+                <span class="label">Day of Year</span>
+            </div>
+            <div class="result-item">
+                <span class="value">Q${quarter}</span>
+                <span class="label">Quarter</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${daysRemaining}</span>
+                <span class="label">Days Remaining</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border);">
+            <p><strong>Day of Week:</strong> ${dayOfWeek}</p>
+            <p><strong>Year Type:</strong> ${isLeapYear(date.getFullYear()) ? 'Leap Year (366 days)' : 'Regular Year (365 days)'}</p>
+        </div>
+        
+        <button class="copy-btn" onclick="copyResult('week')">📋 Copy Result</button>
+    `;
+});
+
+// ============================================
+// AGE COMPARISON
+// ============================================
+
+document.getElementById('compareForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const person1Input = document.getElementById('person1DOB').value;
+    const person2Input = document.getElementById('person2DOB').value;
+    const resultDiv = document.getElementById('compareResult');
+    const errorDiv = document.getElementById('compareError');
+    
+    resultDiv.innerHTML = '';
+    errorDiv.innerHTML = '';
+    
+    if (!validateDate(person1Input) || !validateDate(person2Input)) {
+        errorDiv.innerHTML = '❌ Please enter valid dates.';
+        return;
+    }
+    
+    const person1DOB = new Date(person1Input);
+    const person2DOB = new Date(person2Input);
+    const today = new Date();
+    
+    if (person1DOB > today || person2DOB > today) {
+        errorDiv.innerHTML = '❌ Birth dates cannot be in the future!';
+        return;
+    }
+    
+    const age1 = calculateDateDifference(person1DOB, today);
+    const age2 = calculateDateDifference(person2DOB, today);
+    
+    let older, younger, ageDiff;
+    if (person1DOB < person2DOB) {
+        older = { age: age1, label: 'Person 1' };
+        younger = { age: age2, label: 'Person 2' };
+        ageDiff = calculateDateDifference(person1DOB, person2DOB);
+    } else {
+        older = { age: age2, label: 'Person 2' };
+        younger = { age: age1, label: 'Person 1' };
+        ageDiff = calculateDateDifference(person2DOB, person1DOB);
+    }
+    
+    const daysDiff = calculateTotalDays(person1DOB < person2DOB ? person1DOB : person2DOB, 
+                                        person1DOB < person2DOB ? person2DOB : person1DOB);
+    
+    resultDiv.innerHTML = `
+        <h3>👥 Age Comparison</h3>
+        <div class="result-grid">
+            <div class="result-item">
+                <span class="value">${age1.years}</span>
+                <span class="label">Person 1 Age (Years)</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${age2.years}</span>
+                <span class="label">Person 2 Age (Years)</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1.5rem; padding: 1.5rem; background: var(--bg-secondary); border: 2px solid var(--accent);">
+            <h4 style="text-align: center; margin-bottom: 1rem; color: var(--accent);">Age Difference</h4>
+            <p style="text-align: center; font-size: 1.25rem;"><strong>${ageDiff.years} years, ${ageDiff.months} months, ${ageDiff.days} days</strong></p>
+            <p style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary);">(${formatNumber(daysDiff)} total days)</p>
+            <p style="text-align: center; margin-top: 1rem;">${older.label} is older</p>
+        </div>
+        
+        <button class="copy-btn" onclick="copyResult('compare')">📋 Copy Result</button>
+    `;
+});
+
+// ============================================
+// HISTORICAL DATE CALCULATOR
+// ============================================
+
+document.getElementById('historicalForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const dateInput = document.getElementById('historicalDate').value;
+    const resultDiv = document.getElementById('historicalResult');
+    const errorDiv = document.getElementById('historicalError');
+    
+    resultDiv.innerHTML = '';
+    errorDiv.innerHTML = '';
+    
+    if (!validateDate(dateInput)) {
+        errorDiv.innerHTML = '❌ Please enter a valid date.';
+        return;
+    }
+    
+    const historicalDate = new Date(dateInput);
+    const today = new Date();
+    
+    const isPast = historicalDate < today;
+    const difference = isPast ? 
+        calculateDateDifference(historicalDate, today) : 
+        calculateDateDifference(today, historicalDate);
+    
+    const totalDays = calculateTotalDays(historicalDate, today);
+    const totalWeeks = Math.floor(totalDays / 7);
+    const totalMonths = calculateTotalMonths(historicalDate < today ? historicalDate : today, 
+                                             historicalDate < today ? today : historicalDate);
+    const totalYears = difference.years;
+    
+    // Calculate decades and centuries
+    const decades = Math.floor(totalYears / 10);
+    const centuries = Math.floor(totalYears / 100);
+    
+    const timeLabel = isPast ? 'ago' : 'from now';
+    
+    resultDiv.innerHTML = `
+        <h3>📜 Historical Date Analysis</h3>
+        <div class="result-grid">
+            <div class="result-item">
+                <span class="value">${difference.years}</span>
+                <span class="label">Years ${timeLabel}</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${formatNumber(totalDays)}</span>
+                <span class="label">Total Days</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${formatNumber(totalWeeks)}</span>
+                <span class="label">Total Weeks</span>
+            </div>
+            <div class="result-item">
+                <span class="value">${formatNumber(totalMonths)}</span>
+                <span class="label">Total Months</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border);">
+            <p><strong>Full Difference:</strong> ${difference.years} years, ${difference.months} months, ${difference.days} days</p>
+            ${decades > 0 ? `<p><strong>Decades:</strong> ${decades} decade${decades > 1 ? 's' : ''}</p>` : ''}
+            ${centuries > 0 ? `<p><strong>Centuries:</strong> ${centuries} centur${centuries > 1 ? 'ies' : 'y'}</p>` : ''}
+            <p><strong>Status:</strong> ${isPast ? 'This date has passed' : 'This date is in the future'}</p>
+        </div>
+        
+        <button class="copy-btn" onclick="copyResult('historical')">📋 Copy Result</button>
+    `;
+});
+
+// ============================================
 // COUNTDOWN CALCULATOR
 // ============================================
 
@@ -452,32 +724,42 @@ function startLiveCounter(birthDate) {
 function clearForm(formId) {
     document.getElementById(formId).reset();
     
-    // Clear corresponding result and error divs
+    const formMap = {
+        'ageForm': { result: 'ageResult', error: 'ageError' },
+        'diffForm': { result: 'diffResult', error: 'diffError' },
+        'countdownForm': { result: 'countdownResult', error: 'countdownError' },
+        'timeForm': { result: 'timeResult', error: 'timeError' },
+        'weekForm': { result: 'weekResult', error: 'weekError' },
+        'compareForm': { result: 'compareResult', error: 'compareError' },
+        'historicalForm': { result: 'historicalResult', error: 'historicalError' }
+    };
+    
+    if (formMap[formId]) {
+        document.getElementById(formMap[formId].result).innerHTML = '';
+        document.getElementById(formMap[formId].error).innerHTML = '';
+    }
+    
     if (formId === 'ageForm') {
-        document.getElementById('ageResult').innerHTML = '';
-        document.getElementById('ageError').innerHTML = '';
         document.getElementById('liveCounterSection').style.display = 'none';
         if (liveCounterInterval) clearInterval(liveCounterInterval);
-    } else if (formId === 'diffForm') {
-        document.getElementById('diffResult').innerHTML = '';
-        document.getElementById('diffError').innerHTML = '';
-    } else if (formId === 'countdownForm') {
-        document.getElementById('countdownResult').innerHTML = '';
-        document.getElementById('countdownError').innerHTML = '';
     }
 }
 
 function copyResult(type) {
     let text = '';
     
-    if (type === 'age') {
-        const resultDiv = document.getElementById('ageResult');
-        text = resultDiv.innerText;
-    } else if (type === 'diff') {
-        const resultDiv = document.getElementById('diffResult');
-        text = resultDiv.innerText;
-    } else if (type === 'countdown') {
-        const resultDiv = document.getElementById('countdownResult');
+    const resultMap = {
+        'age': 'ageResult',
+        'diff': 'diffResult',
+        'countdown': 'countdownResult',
+        'time': 'timeResult',
+        'week': 'weekResult',
+        'compare': 'compareResult',
+        'historical': 'historicalResult'
+    };
+    
+    const resultDiv = document.getElementById(resultMap[type]);
+    if (resultDiv) {
         text = resultDiv.innerText;
     }
     

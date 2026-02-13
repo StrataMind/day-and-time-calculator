@@ -27,8 +27,11 @@
 
     <div class="container">
         <header>
-            <h1>⏰ Time & Age Precision Calculator</h1>
-            <p>Calculate exact age, date differences, and countdowns with precision</p>
+            <div class="header-ornament">✦</div>
+            <h1>Time & Age Calculator</h1>
+            <div class="subtitle">Est. 2025</div>
+            <p>Precision Calculations for Every Moment</p>
+            <div class="header-ornament">✦</div>
         </header>
 
         <!-- Age Calculator -->
@@ -86,7 +89,87 @@
             <div id="countdownError" class="error"></div>
         </section>
 
-        <!-- Live Counter (Advanced Feature) -->
+        <!-- Time Between Calculator -->
+        <section class="card">
+            <h2>🕐 Time Between Two Moments</h2>
+            <form id="timeForm">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="startDateTime">Start Date & Time</label>
+                        <input type="datetime-local" id="startDateTime" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="endDateTime">End Date & Time</label>
+                        <input type="datetime-local" id="endDateTime" required>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Calculate Time</button>
+                    <button type="button" class="btn-secondary" onclick="clearForm('timeForm')">Clear</button>
+                </div>
+            </form>
+            <div id="timeResult" class="result"></div>
+            <div id="timeError" class="error"></div>
+        </section>
+
+        <!-- Week Calculator -->
+        <section class="card">
+            <h2>📆 Week Number & Day Calculator</h2>
+            <form id="weekForm">
+                <div class="input-group">
+                    <label for="weekDate">Select Date</label>
+                    <input type="date" id="weekDate" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Get Week Info</button>
+                    <button type="button" class="btn-secondary" onclick="clearForm('weekForm')">Clear</button>
+                </div>
+            </form>
+            <div id="weekResult" class="result"></div>
+            <div id="weekError" class="error"></div>
+        </section>
+
+        <!-- Age Comparison -->
+        <section class="card">
+            <h2>👥 Compare Two Ages</h2>
+            <form id="compareForm">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="person1DOB">Person 1 Birth Date</label>
+                        <input type="date" id="person1DOB" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="person2DOB">Person 2 Birth Date</label>
+                        <input type="date" id="person2DOB" required>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Compare Ages</button>
+                    <button type="button" class="btn-secondary" onclick="clearForm('compareForm')">Clear</button>
+                </div>
+            </form>
+            <div id="compareResult" class="result"></div>
+            <div id="compareError" class="error"></div>
+        </section>
+
+        <!-- Historical Events -->
+        <section class="card">
+            <h2>📜 Historical Date Calculator</h2>
+            <form id="historicalForm">
+                <div class="input-group">
+                    <label for="historicalDate">Historical Date</label>
+                    <input type="date" id="historicalDate" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Calculate</button>
+                    <button type="button" class="btn-secondary" onclick="clearForm('historicalForm')">Clear</button>
+                </div>
+            </form>
+            <div id="historicalResult" class="result"></div>
+            <div id="historicalError" class="error"></div>
+        </section>
+
+        <!-- Live Counter -->
         <section class="card" id="liveCounterSection" style="display: none;">
             <h2>⚡ Live Time Counter</h2>
             <div id="liveCounter" class="live-counter"></div>
@@ -94,7 +177,10 @@
     </div>
 
     <footer>
-        <p>Built with precision • Handles leap years automatically • Timezone-safe calculations</p>
+        <div class="footer-ornament">◆◆◆</div>
+        <p>Built with Precision & Care</p>
+        <p class="footer-small">Leap Year Aware • Timezone Safe • Accurate Calculations</p>
+        <div class="footer-ornament">◆◆◆</div>
     </footer>
 
     <script src="script.js"></script>
